@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Have you seen this kid? — Kenji</title>
+<title>Have you seen Kenji?</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:'Poppins',system-ui,sans-serif;}
@@ -25,6 +25,7 @@ h1{
   text-shadow:0 0 10px #ffb700,0 0 20px #ff7b00;
   animation:floatText 2s ease-in-out infinite alternate;
 }
+
 @keyframes floatText{
   0%{transform:translateY(0px);}
   50%{transform:translateY(-12px);}
@@ -85,6 +86,31 @@ h1{
   margin-left:30px;
   flex-shrink:0;
 }
+
+/* Info section */
+#infoSection{
+  margin-top:20px;
+  background:rgba(0,0,0,0.4);
+  padding:15px 25px;
+  border-radius:15px;
+  box-shadow:0 0 20px rgba(255,255,255,0.2);
+  text-align:left;
+  max-width:350px;
+}
+#infoSection h2{
+  margin-bottom:10px;
+  color:#ffd700;
+  text-align:center;
+}
+#infoSection ul{
+  list-style:none;
+  padding-left:0;
+}
+#infoSection li{
+  margin-bottom:8px;
+  color:#fff;
+  font-size:1.1rem;
+}
 </style>
 </head>
 <body>
@@ -94,6 +120,15 @@ h1{
   <img src="IMG_20251105_130829.jpg" alt="Kenji">
 </div>
 <p class="reward">💰 REWARD: $67,000,000 💰</p>
+
+<div id="infoSection">
+  <h2>Kenji Info</h2>
+  <ul>
+    <li>1. Last seen at math class</li>
+    <li>2. Likes sand soccer girl</li>
+    <li>3. David Borchilla is better at tennis</li>
+  </ul>
+</div>
 
 <button id="fireworksBtn">Celebrate Finding Him 🎆</button>
 <canvas id="canvas"></canvas>
@@ -118,13 +153,13 @@ function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
 window.addEventListener('resize',resize);
 resize();
 
-// Stars in background
+// Background stars
 let stars=[];
 for(let i=0;i<120;i++){
   stars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5,alpha:Math.random()});
 }
 
-// Sparks floating across screen
+// Sparks floating
 let sparks=[];
 function createSpark(){
   sparks.push({
