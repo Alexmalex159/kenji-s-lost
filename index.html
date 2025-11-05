@@ -64,34 +64,60 @@
   <canvas id="fireworks"></canvas>
 
   <script>
-    const canvas=document.getElementById('fireworks');
-    const ctx=canvas.getContext('2d');
-    let w,h;function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;}window.addEventListener('resize',resize);resize();
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    let w, h;
 
-    let fireworks=[];
-    function launchFirework(){
-      for(let i=0;i<100;i++){
+    function resize() {
+      w = canvas.width = innerWidth;
+      h = canvas.height = innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let fireworks = [];
+
+    function launchFirework() {
+      for (let i = 0; i < 100; i++) {
         fireworks.push({
-          x:w/2,y:h/2,vx:(Math.random()-0.5)*12,vy:(Math.random()-0.7)*12,
-          alpha:1,color:`hsl(${Math.random()*360},100%,60%)`,size:3+Math.random()*3
+          x: w / 2,
+          y: h / 2,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.7) * 12,
+          alpha: 1,
+          color: `hsl(${Math.random() * 360},100%,60%)`,
+          size: 3 + Math.random() * 3
         });
       }
     }
 
-    function animate(){
-      ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(0,0,w,h);
-      fireworks.forEach(p=>{
-        p.x+=p.vx;p.y+=p.vy;p.vy+=0.15;p.alpha-=0.01;
-        ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-        ctx.fillStyle=`${p.color}`;ctx.globalAlpha=p.alpha;ctx.fill();ctx.globalAlpha=1;
+    function animate() {
+      // Semi-transparent black for trails (lower alpha = longer visible trails)
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';
+      ctx.fillRect(0, 0, w, h);
+
+      fireworks.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15;
+        p.alpha -= 0.007; // slower fade for longer visibility
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
       });
-      fireworks=fireworks.filter(p=>p.alpha>0);
+
+      fireworks = fireworks.filter(p => p.alpha > 0);
       requestAnimationFrame(animate);
     }
+
     animate();
 
-    document.getElementById('fireworksBtn').addEventListener('click',()=>{
-      for(let i=0;i<10;i++) setTimeout(launchFirework,i*200);
+    document.getElementById('fireworksBtn').addEventListener('click', () => {
+      for (let i = 0; i < 10; i++) setTimeout(launchFirework, i * 200);
     });
   </script>
 </body>
