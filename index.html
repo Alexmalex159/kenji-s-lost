@@ -92,25 +92,21 @@
     }
 
     function animate() {
-      // Semi-transparent black for trails (lower alpha = longer visible trails)
-      ctx.fillStyle = 'rgba(0,0,0,0.05)';
-      ctx.fillRect(0, 0, w, h);
+      // CLEAR canvas fully each frame (no fade to black)
+      ctx.clearRect(0, 0, w, h);
 
       fireworks.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
         p.vy += 0.15;
-        p.alpha -= 0.007; // slower fade for longer visibility
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.alpha;
+        ctx.globalAlpha = 1; // full opacity
         ctx.fill();
-        ctx.globalAlpha = 1;
       });
 
-      fireworks = fireworks.filter(p => p.alpha > 0);
       requestAnimationFrame(animate);
     }
 
