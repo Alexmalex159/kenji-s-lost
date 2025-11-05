@@ -82,14 +82,14 @@ h1{
 }
 .movingEmoji{
   font-size:2rem;
-  margin-left:20px;
-  flex-shrink:0;
+  position:absolute;
+  top:10px; /* random later */
 }
 
 /* Info section moved up */
 #infoSection{
   margin-top:20px;
-  margin-bottom:100px; /* space from bottom button */
+  margin-bottom:120px; /* space from bottom button */
   background:rgba(0,0,0,0.4);
   padding:15px 25px;
   border-radius:15px;
@@ -135,18 +135,7 @@ h1{
 <button id="fireworksBtn">Celebrate Finding Him 🎆</button>
 <canvas id="canvas"></canvas>
 
-<div id="bottomBar">
-  <div class="movingEmoji">💧</div>
-  <div class="movingEmoji">🚨</div>
-  <div class="movingEmoji">💧</div>
-  <div class="movingEmoji">🚨</div>
-  <div class="movingEmoji">💧</div>
-  <div class="movingEmoji">🚨</div>
-  <div class="movingEmoji">💧</div>
-  <div class="movingEmoji">🚨</div>
-  <div class="movingEmoji">💧</div>
-  <div class="movingEmoji">🚨</div>
-</div>
+<div id="bottomBar"></div>
 
 <script>
 // Canvas setup
@@ -157,13 +146,13 @@ function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
 window.addEventListener('resize',resize);
 resize();
 
-// Background stars
+// Stars
 let stars=[];
 for(let i=0;i<120;i++){
   stars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5,alpha:Math.random()});
 }
 
-// Sparks floating
+// Sparks
 let sparks=[];
 function createSpark(){
   sparks.push({
@@ -177,32 +166,32 @@ function createSpark(){
   });
 }
 
-// Fireworks particles
+// Fireworks
 let fireworks=[];
 function launchFireworks(){
-  let positions = [w*0.25, w*0.5, w*0.75]; // 3 locations
+  let positions = [w*0.2, w*0.5, w*0.8]; // 3 locations
   positions.forEach(startX=>{
-    for(let f=0; f<3; f++){ // 3 bursts per location
+    for(let f=0; f<3; f++){ // 3 bursts per location = 9 total
       let startY=h*0.7;
-      for(let i=0;i<80;i++){
+      for(let i=0;i<120;i++){ // more particles for bigger fireworks
         const angle = Math.random()*2*Math.PI;
-        const speed = Math.random()*8+2;
+        const speed = Math.random()*12+3;
         fireworks.push({
           x:startX,
           y:startY,
           vx:Math.cos(angle)*speed,
           vy:Math.sin(angle)*speed,
-          size:2+Math.random()*3,
+          size:3+Math.random()*4,
           alpha:1,
           color:`hsl(${Math.random()*360},100%,60%)`,
-          decay:0.01+Math.random()*0.01
+          decay:0.008+Math.random()*0.01
         });
       }
     }
   });
 }
 
-// Animate everything
+// Animate
 function animate(){
   ctx.clearRect(0,0,w,h);
 
@@ -235,7 +224,7 @@ function animate(){
   fireworks.forEach(f=>{
     f.x+=f.vx;
     f.y+=f.vy;
-    f.vy+=0.05; // gravity
+    f.vy+=0.08; // gravity
     f.alpha-=f.decay;
     ctx.beginPath();
     ctx.arc(f.x,f.y,f.size,0,Math.PI*2);
@@ -253,19 +242,29 @@ animate();
 // Fireworks button
 document.getElementById('fireworksBtn').addEventListener('click',()=>{ launchFireworks(); });
 
-// Bottom bar emojis movement
-const emojis=document.querySelectorAll('.movingEmoji');
-let positions=[];
-emojis.forEach((e,i)=>positions.push(i*100));
-function animateEmojis(){
-  emojis.forEach((e,i)=>{
-    positions[i]-=6; // speed
-    if(positions[i]<-50) positions[i]=window.innerWidth;
-    e.style.transform=`translateX(${positions[i]}px)`;
+// Bottom emojis setup
+const bottomBar=document.getElementById('bottomBar');
+const emojisArr=["💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨"];
+let bottomEmojis=[];
+emojisArr.forEach((e,i)=>{
+  const div=document.createElement('div');
+  div.className='movingEmoji';
+  div.textContent=e;
+  div.style.top=(5+Math.random()*20)+'px'; // random vertical
+  bottomBar.appendChild(div);
+  bottomEmojis.push({el:div,x:i*60});
+});
+
+// Animate bottom emojis
+function animateBottomEmojis(){
+  bottomEmojis.forEach(b=>{
+    b.x-=6;
+    if(b.x<-50)b.x=window.innerWidth;
+    b.el.style.transform=`translateX(${b.x}px)`;
   });
-  requestAnimationFrame(animateEmojis);
+  requestAnimationFrame(animateBottomEmojis);
 }
-animateEmojis();
+animateBottomEmojis();
 </script>
 </body>
 </html>
