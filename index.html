@@ -25,7 +25,6 @@ h1{
   text-shadow:0 0 10px #ffb700,0 0 20px #ff7b00;
   animation:floatText 2s ease-in-out infinite alternate;
 }
-
 @keyframes floatText{
   0%{transform:translateY(0px);}
   50%{transform:translateY(-12px);}
@@ -83,7 +82,7 @@ h1{
 }
 .movingEmoji{
   font-size:2rem;
-  margin-left:30px;
+  margin-left:20px;
   flex-shrink:0;
 }
 
@@ -145,6 +144,8 @@ h1{
   <div class="movingEmoji">🚨</div>
   <div class="movingEmoji">💧</div>
   <div class="movingEmoji">🚨</div>
+  <div class="movingEmoji">💧</div>
+  <div class="movingEmoji">🚨</div>
 </div>
 
 <script>
@@ -179,23 +180,26 @@ function createSpark(){
 // Fireworks particles
 let fireworks=[];
 function launchFireworks(){
-  for(let f=0;f<3;f++){
-    let startX=Math.random()*w;
-    let startY=h*0.7;
-    for(let i=0;i<80;i++){
-      const angle = Math.random()*2*Math.PI;
-      const speed = Math.random()*8+2;
-      fireworks.push({
-        x:startX,y:startY,
-        vx:Math.cos(angle)*speed,
-        vy:Math.sin(angle)*speed,
-        size:2+Math.random()*3,
-        alpha:1,
-        color:`hsl(${Math.random()*360},100%,60%)`,
-        decay:0.01+Math.random()*0.01
-      });
+  let positions = [w*0.25, w*0.5, w*0.75]; // 3 locations
+  positions.forEach(startX=>{
+    for(let f=0; f<3; f++){ // 3 bursts per location
+      let startY=h*0.7;
+      for(let i=0;i<80;i++){
+        const angle = Math.random()*2*Math.PI;
+        const speed = Math.random()*8+2;
+        fireworks.push({
+          x:startX,
+          y:startY,
+          vx:Math.cos(angle)*speed,
+          vy:Math.sin(angle)*speed,
+          size:2+Math.random()*3,
+          alpha:1,
+          color:`hsl(${Math.random()*360},100%,60%)`,
+          decay:0.01+Math.random()*0.01
+        });
+      }
     }
-  }
+  });
 }
 
 // Animate everything
@@ -255,7 +259,7 @@ let positions=[];
 emojis.forEach((e,i)=>positions.push(i*100));
 function animateEmojis(){
   emojis.forEach((e,i)=>{
-    positions[i]-=6; // faster speed
+    positions[i]-=6; // speed
     if(positions[i]<-50) positions[i]=window.innerWidth;
     e.style.transform=`translateX(${positions[i]}px)`;
   });
