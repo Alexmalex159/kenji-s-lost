@@ -83,10 +83,10 @@ h1{
 .movingEmoji{
   font-size:2rem;
   position:absolute;
-  top:10px; /* random later */
+  top:10px;
 }
 
-/* Info section moved up */
+/* Info section */
 #infoSection{
   margin-top:20px;
   margin-bottom:120px; /* space from bottom button */
@@ -169,13 +169,17 @@ function createSpark(){
 // Fireworks
 let fireworks=[];
 function launchFireworks(){
-  let positions = [w*0.2, w*0.5, w*0.8]; // 3 locations
+  const positions=[];
+  for(let i=0;i<12;i++){ // 12 horizontal positions
+    positions.push(w*0.05 + i*(w*0.08));
+  }
   positions.forEach(startX=>{
-    for(let f=0; f<3; f++){ // 3 bursts per location = 9 total
+    for(let f=0; f<5; f++){ // 5 bursts per position = lots of fireworks
       let startY=h*0.7;
-      for(let i=0;i<120;i++){ // more particles for bigger fireworks
+      for(let i=0;i<120;i++){ // more particles
         const angle = Math.random()*2*Math.PI;
-        const speed = Math.random()*12+3;
+        const speed = Math.random()*12 + 4;
+        const hue = Math.random()*360;
         fireworks.push({
           x:startX,
           y:startY,
@@ -183,7 +187,9 @@ function launchFireworks(){
           vy:Math.sin(angle)*speed,
           size:3+Math.random()*4,
           alpha:1,
-          color:`hsl(${Math.random()*360},100%,60%)`,
+          colorHue:hue,
+          colorSat:100,
+          colorLight:60,
           decay:0.008+Math.random()*0.01
         });
       }
@@ -224,11 +230,12 @@ function animate(){
   fireworks.forEach(f=>{
     f.x+=f.vx;
     f.y+=f.vy;
-    f.vy+=0.08; // gravity
+    f.vy+=0.08;
     f.alpha-=f.decay;
+    f.colorHue+=1; // rainbow effect
     ctx.beginPath();
     ctx.arc(f.x,f.y,f.size,0,Math.PI*2);
-    ctx.fillStyle=f.color;
+    ctx.fillStyle=`hsl(${f.colorHue},${f.colorSat}%,${f.colorLight}%)`;
     ctx.globalAlpha=f.alpha;
     ctx.fill();
     ctx.globalAlpha=1;
@@ -244,15 +251,15 @@ document.getElementById('fireworksBtn').addEventListener('click',()=>{ launchFir
 
 // Bottom emojis setup
 const bottomBar=document.getElementById('bottomBar');
-const emojisArr=["💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨"];
+const emojisArr=["💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨"];
 let bottomEmojis=[];
 emojisArr.forEach((e,i)=>{
   const div=document.createElement('div');
   div.className='movingEmoji';
   div.textContent=e;
-  div.style.top=(5+Math.random()*20)+'px'; // random vertical
+  div.style.top=(5+Math.random()*20)+'px';
   bottomBar.appendChild(div);
-  bottomEmojis.push({el:div,x:i*60});
+  bottomEmojis.push({el:div,x:i*50});
 });
 
 // Animate bottom emojis
