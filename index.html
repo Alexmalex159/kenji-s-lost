@@ -16,6 +16,7 @@ body{
   animation:gradientMove 12s ease infinite alternate;
   color:#fff;
   position:relative;
+  transition: background-color 2s linear;
 }
 
 @keyframes gradientMove{
@@ -191,11 +192,11 @@ function createSpark(){
 let fireworks=[];
 function launchFireworks(){
   const positions=[];
-  for(let i=0;i<5;i++){ // 5 positions
+  for(let i=0;i<5;i++){
     positions.push(w*0.1 + i*(w*0.15));
   }
   positions.forEach(startX=>{
-    for(let f=0; f<3; f++){ // 3 bursts per position = 15 bursts
+    for(let f=0; f<3; f++){
       let startY=h*0.7;
       for(let i=0;i<80;i++){
         const angle = Math.random()*2*Math.PI;
@@ -309,6 +310,10 @@ function animate(){
   });
   confetti=confetti.filter(c=>c.alpha>0);
 
+  // Slowly change background hue
+  let bodyHue = (Date.now()/100)%360;
+  document.body.style.backgroundColor = `hsl(${bodyHue}, 30%, 10%)`;
+
   requestAnimationFrame(animate);
 }
 animate();
@@ -318,20 +323,20 @@ document.getElementById('fireworksBtn').addEventListener('click',()=>{ launchFir
 
 // Bottom emojis
 const bottomBar=document.getElementById('bottomBar');
-const emojisArr=["💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨"];
+const emojisArr=["💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨"];
 let bottomEmojis=[];
 emojisArr.forEach((e,i)=>{
   const div=document.createElement('div');
   div.className='movingEmoji';
   div.textContent=e;
-  div.style.top=(5+Math.random()*20)+'px';
+  div.style.top=(5+Math.random()*30)+'px';
   bottomBar.appendChild(div);
-  bottomEmojis.push({el:div,x:i*50});
+  bottomEmojis.push({el:div,x:i*40});
 });
 
 function animateBottomEmojis(){
   bottomEmojis.forEach(b=>{
-    b.x-=6;
+    b.x-=10; // faster
     if(b.x<-50)b.x=window.innerWidth;
     b.el.style.transform=`translateX(${b.x}px)`;
   });
@@ -341,3 +346,4 @@ animateBottomEmojis();
 </script>
 </body>
 </html>
+
