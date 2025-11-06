@@ -15,6 +15,7 @@ body{
   color:#fff;
   position:relative;
 }
+
 @keyframes gradientMove{
   0%{background-position:0% 0%;}
   100%{background-position:100% 100%;}
@@ -41,6 +42,11 @@ h1{
   box-shadow:0 0 60px rgba(255,255,255,0.3),0 0 80px #7f00ff;
   border:4px solid rgba(255,255,255,0.5);
   animation:floatPhoto 3s ease-in-out infinite alternate;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.photo:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 120px #ffb700,0 0 150px #ff7b00;
 }
 @keyframes floatPhoto{
   0%{transform:translateY(0px);}
@@ -68,7 +74,7 @@ h1{
   box-shadow:0 0 50px #ffb700,0 0 80px #ff7b00;
 }
 
-#canvas{
+#canvas, #confettiCanvas{
   position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;
   z-index:0;
 }
@@ -86,10 +92,20 @@ h1{
   top:10px;
 }
 
+/* Floating alerts */
+.floatingAlert{
+  position:absolute;
+  color:#ff0000;
+  font-size:1.5rem;
+  font-weight:bold;
+  text-shadow:0 0 5px #fff,0 0 10px #ff0000;
+  pointer-events:none;
+}
+
 /* Info section */
 #infoSection{
   margin-top:20px;
-  margin-bottom:120px; /* space from bottom button */
+  margin-bottom:140px;
   background:rgba(0,0,0,0.4);
   padding:15px 25px;
   border-radius:15px;
@@ -134,6 +150,7 @@ h1{
 
 <button id="fireworksBtn">Celebrate Finding Him 🎆</button>
 <canvas id="canvas"></canvas>
+<canvas id="confettiCanvas"></canvas>
 
 <div id="bottomBar"></div>
 
@@ -141,8 +158,10 @@ h1{
 // Canvas setup
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const confettiCanvas = document.getElementById('confettiCanvas');
+const confettiCtx = confettiCanvas.getContext('2d');
 let w,h;
-function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
+function resize(){ w=canvas.width=confettiCanvas.width=innerWidth; h=canvas.height=confettiCanvas.height=innerHeight; }
 window.addEventListener('resize',resize);
 resize();
 
@@ -170,36 +189,77 @@ function createSpark(){
 let fireworks=[];
 function launchFireworks(){
   const positions=[];
-  for(let i=0;i<12;i++){ // 12 horizontal positions
+  for(let i=0;i<12;i++){
     positions.push(w*0.05 + i*(w*0.08));
   }
   positions.forEach(startX=>{
-    for(let f=0; f<5; f++){ // 5 bursts per position = lots of fireworks
+    for(let f=0; f<5; f++){
       let startY=h*0.7;
-      for(let i=0;i<120;i++){ // more particles
+      for(let i=0;i<150;i++){
         const angle = Math.random()*2*Math.PI;
-        const speed = Math.random()*12 + 4;
+        const speed = Math.random()*15 + 5;
         const hue = Math.random()*360;
         fireworks.push({
           x:startX,
           y:startY,
           vx:Math.cos(angle)*speed,
           vy:Math.sin(angle)*speed,
-          size:3+Math.random()*4,
+          size:3+Math.random()*5,
           alpha:1,
           colorHue:hue,
           colorSat:100,
           colorLight:60,
-          decay:0.008+Math.random()*0.01
+          decay:0.006+Math.random()*0.008
         });
       }
     }
   });
+  // Also trigger floating alerts
+  for(let i=0;i<3;i++){
+    createFloatingAlert();
+  }
+  // Trigger confetti
+  for(let i=0;i<50;i++) createConfetti();
 }
 
-// Animate
+// Floating alerts
+function createFloatingAlert(){
+  const alert=document.createElement('div');
+  alert.className='floatingAlert';
+  const messages=["KENJI SPOTTED!","🚨 ALERT!","FIND KENJI!"];
+  alert.textContent=messages[Math.floor(Math.random()*messages.length)];
+  alert.style.left=Math.random()*(w-200)+'px';
+  alert.style.top=h+'px';
+  document.body.appendChild(alert);
+  let top=parseFloat(alert.style.top);
+  let id=setInterval(()=>{
+    top-=2;
+    alert.style.top=top+'px';
+    if(top<-50){
+      clearInterval(id);
+      alert.remove();
+    }
+  },20);
+}
+
+// Confetti
+let confetti=[];
+function createConfetti(){
+  confetti.push({
+    x:Math.random()*w,
+    y:Math.random()*-h,
+    vx:(Math.random()-0.5)*3,
+    vy:Math.random()*3+2,
+    size:5+Math.random()*5,
+    color:`hsl(${Math.random()*360},100%,60%)`,
+    alpha:1
+  });
+}
+
+// Animate everything
 function animate(){
   ctx.clearRect(0,0,w,h);
+  confettiCtx.clearRect(0,0,w,h);
 
   // Stars
   stars.forEach(s=>{
@@ -232,7 +292,7 @@ function animate(){
     f.y+=f.vy;
     f.vy+=0.08;
     f.alpha-=f.decay;
-    f.colorHue+=1; // rainbow effect
+    f.colorHue+=1;
     ctx.beginPath();
     ctx.arc(f.x,f.y,f.size,0,Math.PI*2);
     ctx.fillStyle=`hsl(${f.colorHue},${f.colorSat}%,${f.colorLight}%)`;
@@ -242,6 +302,18 @@ function animate(){
   });
   fireworks=fireworks.filter(f=>f.alpha>0);
 
+  // Confetti
+  confetti.forEach(c=>{
+    c.x+=c.vx;
+    c.y+=c.vy;
+    c.alpha-=0.002;
+    confettiCtx.fillStyle=c.color;
+    confettiCtx.globalAlpha=c.alpha;
+    confettiCtx.fillRect(c.x,c.y,c.size,c.size);
+    confettiCtx.globalAlpha=1;
+  });
+  confetti=confetti.filter(c=>c.alpha>0);
+
   requestAnimationFrame(animate);
 }
 animate();
@@ -249,7 +321,7 @@ animate();
 // Fireworks button
 document.getElementById('fireworksBtn').addEventListener('click',()=>{ launchFireworks(); });
 
-// Bottom emojis setup
+// Bottom emojis
 const bottomBar=document.getElementById('bottomBar');
 const emojisArr=["💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨","💧","🚨"];
 let bottomEmojis=[];
@@ -262,7 +334,6 @@ emojisArr.forEach((e,i)=>{
   bottomEmojis.push({el:div,x:i*50});
 });
 
-// Animate bottom emojis
 function animateBottomEmojis(){
   bottomEmojis.forEach(b=>{
     b.x-=6;
