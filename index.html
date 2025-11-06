@@ -10,7 +10,9 @@ html,body{height:100%;overflow:hidden;font-family:'Poppins',system-ui,sans-serif
 body{
   display:flex;align-items:center;justify-content:center;
   flex-direction:column;text-align:center;
-  background:radial-gradient(circle at top left,#ff7b00,#210045,#000);
+  background:radial-gradient(circle at top left,#ff7b00,#210045,#000),
+              radial-gradient(circle at bottom right,#00ffea,#4b0082,#000);
+  background-blend-mode:overlay;
   animation:gradientMove 12s ease infinite alternate;
   color:#fff;
   position:relative;
@@ -189,37 +191,33 @@ function createSpark(){
 let fireworks=[];
 function launchFireworks(){
   const positions=[];
-  for(let i=0;i<12;i++){
-    positions.push(w*0.05 + i*(w*0.08));
+  for(let i=0;i<5;i++){ // 5 positions
+    positions.push(w*0.1 + i*(w*0.15));
   }
   positions.forEach(startX=>{
-    for(let f=0; f<5; f++){
+    for(let f=0; f<3; f++){ // 3 bursts per position = 15 bursts
       let startY=h*0.7;
-      for(let i=0;i<150;i++){
+      for(let i=0;i<80;i++){
         const angle = Math.random()*2*Math.PI;
-        const speed = Math.random()*15 + 5;
+        const speed = Math.random()*12 + 4;
         const hue = Math.random()*360;
         fireworks.push({
           x:startX,
           y:startY,
           vx:Math.cos(angle)*speed,
           vy:Math.sin(angle)*speed,
-          size:3+Math.random()*5,
+          size:3+Math.random()*4,
           alpha:1,
           colorHue:hue,
           colorSat:100,
           colorLight:60,
-          decay:0.006+Math.random()*0.008
+          decay:0.008+Math.random()*0.01
         });
       }
     }
   });
-  // Also trigger floating alerts
-  for(let i=0;i<3;i++){
-    createFloatingAlert();
-  }
-  // Trigger confetti
-  for(let i=0;i<50;i++) createConfetti();
+  for(let i=0;i<2;i++){ createFloatingAlert(); }
+  for(let i=0;i<30;i++) createConfetti();
 }
 
 // Floating alerts
@@ -235,10 +233,7 @@ function createFloatingAlert(){
   let id=setInterval(()=>{
     top-=2;
     alert.style.top=top+'px';
-    if(top<-50){
-      clearInterval(id);
-      alert.remove();
-    }
+    if(top<-50){ clearInterval(id); alert.remove(); }
   },20);
 }
 
